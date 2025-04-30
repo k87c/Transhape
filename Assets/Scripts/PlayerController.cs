@@ -2,25 +2,33 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
     public float moveSpeed = 5f;  // Velocidad de movimiento
     public float jumpForce = 10f; // Fuerza del salto
 
     private Rigidbody2D rb;       // Referencia al Rigidbody2D del jugador
-    private bool isGrounded;      // Para verificar si el jugador est� tocando el suelo
+    private bool isGrounded;      // Para verificar si el jugador está tocando el suelo
 
-    public Transform groundCheck; // Puntos para detectar si el jugador est� en el suelo
-    public LayerMask groundLayer; // Capa del suelo (para que el salto funcione solo si est� en el suelo)
+    public Transform groundCheck; // Puntos para detectar si el jugador está en el suelo
+    public LayerMask groundLayer; // Capa del suelo (para que el salto funcione solo si está en el suelo)
 
     // Variables para las diferentes formas
     private enum PlayerShape { Square, Rectangle, Circle, Triangle }
     private PlayerShape currentShape;
 
+    // Referencias para los diferentes Colliders
+    private BoxCollider2D boxCollider;
+    private CircleCollider2D circleCollider;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D del jugador
+        boxCollider = GetComponent<BoxCollider2D>(); // Obtener BoxCollider
+        circleCollider = GetComponent<CircleCollider2D>(); // Obtener CircleCollider (si lo hay)
+
         currentShape = PlayerShape.Square; // Comienza como un cuadrado
+        Debug.Log("Jugador iniciado como Cuadrado.");
+        SetShape(PlayerShape.Square); // Inicializa con el cuadrado
     }
 
     // Update is called once per frame
@@ -41,7 +49,7 @@ public class PlayerController : MonoBehaviour
     // Manejo del salto
     private void HandleJump()
     {
-        // Verificar si el jugador est� tocando el suelo
+        // Verificar si el jugador está tocando el suelo
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
 
         // Salto
@@ -56,54 +64,100 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) // Tecla 1 para Cuadrado
         {
-            SetShape(PlayerShape.Square);
+            if (currentShape != PlayerShape.Square) // Solo cambia si no está ya en cuadrado
+            {
+                Debug.Log("Transformando en Cuadrado");
+                SetShape(PlayerShape.Square);
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) // Tecla 2 para Rect�ngulo
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) // Tecla 2 para Rectángulo
         {
-            SetShape(PlayerShape.Rectangle);
+            if (currentShape != PlayerShape.Rectangle) // Solo cambia si no está ya en rectángulo
+            {
+                Debug.Log("Transformando en Rectángulo");
+                SetShape(PlayerShape.Rectangle);
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) // Tecla 3 para C�rculo
+        else if (Input.GetKeyDown(KeyCode.Alpha3)) // Tecla 3 para Círculo
         {
-            SetShape(PlayerShape.Circle);
+            if (currentShape != PlayerShape.Circle) // Solo cambia si no está ya en círculo
+            {
+                Debug.Log("Transformando en Círculo");
+                SetShape(PlayerShape.Circle);
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha4)) // Tecla 4 para Tri�ngulo
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) // Tecla 4 para Triángulo
         {
-            SetShape(PlayerShape.Triangle);
+            if (currentShape != PlayerShape.Triangle) // Solo cambia si no está ya en triángulo
+            {
+                Debug.Log("Transformando en Triángulo");
+                SetShape(PlayerShape.Triangle);
+            }
         }
     }
 
     // Cambiar la forma y aplicar las transformaciones correspondientes
     private void SetShape(PlayerShape newShape)
     {
-        // Cambiar la figura
         currentShape = newShape;
 
-        // Aqu� puedes cambiar la escala o agregar m�s propiedades de cada figura
+        // Cambiar la forma de acuerdo al tipo
         switch (currentShape)
         {
             case PlayerShape.Square:
-                // Cambiar al cuadrado
-                transform.localScale = new Vector3(1, 1, 1);  // Escala del cuadrado
-                // Llamar a una funci�n que habilite las habilidades espec�ficas del cuadrado si las tiene
+                Debug.Log("Forma actual: Cuadrado");
+                SetSquare();
                 break;
 
             case PlayerShape.Rectangle:
-                // Cambiar al rect�ngulo
-                transform.localScale = new Vector3(1.5f, 1, 1);  // Escala del rect�ngulo
-                // Habilidades espec�ficas del rect�ngulo (por ejemplo, mayor velocidad, o nueva habilidad)
+                Debug.Log("Forma actual: Rectángulo");
+                SetRectangle();
                 break;
 
             case PlayerShape.Circle:
-                // Cambiar al c�rculo
-                transform.localScale = new Vector3(1, 1, 1);  // Escala del c�rculo
-                // Habilidades espec�ficas del c�rculo (por ejemplo, rodar o moverse m�s r�pido)
+                Debug.Log("Forma actual: Círculo");
+                SetCircle();
                 break;
 
             case PlayerShape.Triangle:
-                // Cambiar al tri�ngulo
-                transform.localScale = new Vector3(1, 1, 1);  // Escala del tri�ngulo
-                // Habilidades espec�ficas del tri�ngulo (por ejemplo, saltar m�s alto)
+                Debug.Log("Forma actual: Triángulo");
+                SetTriangle();
                 break;
         }
     }
+
+    // Definir los métodos para cada forma
+    private void SetSquare()
+    {
+        // El cuadrado puede ser un Sprite 2D con BoxCollider2D
+        boxCollider.enabled = true;
+        circleCollider.enabled = false;
+        transform.localScale = new Vector3(1, 1, 1);  // Escala del cuadrado
+    }
+
+    private void SetRectangle()
+    {
+        // El rectángulo puede ser un Sprite 2D con BoxCollider2D
+        boxCollider.enabled = true;
+        circleCollider.enabled = false;
+        transform.localScale = new Vector3(2, 1, 1);  // Escala del rectángulo
+    }
+
+    private void SetCircle()
+    {
+        // El círculo usa un CircleCollider2D
+        boxCollider.enabled = false;
+        circleCollider.enabled = true;
+        transform.localScale = new Vector3(1, 1, 1);  // Escala del círculo
+    }
+
+    private void SetTriangle()
+    {
+        // El triángulo se puede usar con un Collider 2D personalizado
+        boxCollider.enabled = true;
+        circleCollider.enabled = false;
+        transform.localScale = new Vector3(1, 1, 1);  // Escala del triángulo
+    }
 }
+
+
