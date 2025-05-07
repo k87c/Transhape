@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+
     public float moveSpeed = 5f;  // Velocidad de movimiento
     public float jumpForce = 10f; // Fuerza del salto
 
@@ -129,6 +130,10 @@ public class PlayerController : MonoBehaviour
     // Definir los métodos para cada forma
     private void SetSquare()
     {
+        // Obtener el componente SpriteRenderer del GameObject
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Square");
+
         // El cuadrado puede ser un Sprite 2D con BoxCollider2D
         boxCollider.enabled = true;
         circleCollider.enabled = false;
@@ -137,6 +142,9 @@ public class PlayerController : MonoBehaviour
 
     private void SetRectangle()
     {
+        // Obtener el componente SpriteRenderer del GameObject
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Rectan");
         // El rectángulo puede ser un Sprite 2D con BoxCollider2D
         boxCollider.enabled = true;
         circleCollider.enabled = false;
@@ -145,6 +153,10 @@ public class PlayerController : MonoBehaviour
 
     private void SetCircle()
     {
+        // Obtener el componente SpriteRenderer del GameObject
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Circle");
+        boxCollider.enabled = false;
         // El círculo usa un CircleCollider2D
         boxCollider.enabled = false;
         circleCollider.enabled = true;
@@ -153,6 +165,9 @@ public class PlayerController : MonoBehaviour
 
     private void SetTriangle()
     {
+        // Obtener el componente SpriteRenderer del GameObject
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Trian");
         // El triángulo se puede usar con un Collider 2D personalizado
         boxCollider.enabled = true;
         circleCollider.enabled = false;
