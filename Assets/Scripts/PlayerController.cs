@@ -16,17 +16,26 @@ public class PlayerController : MonoBehaviour
     private enum PlayerShape { Square, Rectangle, Circle, Triangle }
     private PlayerShape currentShape;
 
+    public GameObject squareObj;
+    public GameObject rectObj;
+    public GameObject circleObj;
+    public GameObject triangleObj;
+
     // Referencias para los diferentes Colliders
     private BoxCollider2D boxCollider;
     private CircleCollider2D circleCollider;
+
+    private int maxHealth = 1;
+    private int currentHealth = 1;
+    private float damageCooldown = 4f; // Tiempo para regenerar vida
+    private float damageTimer = 0f;
+    private bool isInvulnerable = false;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D del jugador
-        boxCollider = GetComponent<BoxCollider2D>(); // Obtener BoxCollider
-        circleCollider = GetComponent<CircleCollider2D>(); // Obtener CircleCollider (si lo hay)
-
         currentShape = PlayerShape.Square; // Comienza como un cuadrado
         Debug.Log("Jugador iniciado como Cuadrado.");
         SetShape(PlayerShape.Square); // Inicializa con el cuadrado
@@ -38,6 +47,7 @@ public class PlayerController : MonoBehaviour
         HandleMovement();
         HandleJump();
         HandleShapeChange();
+        HandleHealthRegeneration();
     }
 
     // Manejo del movimiento
@@ -102,76 +112,84 @@ public class PlayerController : MonoBehaviour
     {
         currentShape = newShape;
 
-        // Cambiar la forma de acuerdo al tipo
+        squareObj.SetActive(false);
+        rectObj.SetActive(false);
+        circleObj.SetActive(false);
+        triangleObj.SetActive(false);
+
         switch (currentShape)
         {
-            case PlayerShape.Square:
-                Debug.Log("Forma actual: Cuadrado");
-                SetSquare();
-                break;
-
-            case PlayerShape.Rectangle:
-                Debug.Log("Forma actual: Rectángulo");
-                SetRectangle();
-                break;
-
-            case PlayerShape.Circle:
-                Debug.Log("Forma actual: Círculo");
-                SetCircle();
-                break;
-
-            case PlayerShape.Triangle:
-                Debug.Log("Forma actual: Triángulo");
-                SetTriangle();
-                break;
+        case PlayerShape.Square:
+            squareObj.SetActive(true);
+            maxHealth = 1;
+            currentHealth = 1;
+            break;
+        case PlayerShape.Rectangle:
+            rectObj.SetActive(true);
+            maxHealth = 2;
+            currentHealth = 2;
+            break;
+        case PlayerShape.Circle:
+            circleObj.SetActive(true);
+            maxHealth = 1;
+            currentHealth = 1;
+            break;
+        case PlayerShape.Triangle:
+            triangleObj.SetActive(true);
+            maxHealth = 1;
+            currentHealth = 1;
+            break;
         }
     }
 
-    // Definir los métodos para cada forma
-    private void SetSquare()
+    public void TakeDamage()
     {
-        // Obtener el componente SpriteRenderer del GameObject
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Square");
+        if (isInvulnerable) return;
+        currentHealth--;
 
-        // El cuadrado puede ser un Sprite 2D con BoxCollider2D
-        boxCollider.enabled = true;
-        circleCollider.enabled = false;
-        transform.localScale = new Vector3(1, 1, 1);  // Escala del cuadrado
+        if (currentShape == PlayerShape.Rectangle)
+        {
+            Debug.Log("¡Rectángulo recibió daño! Vida restante: " + currentHealth);
+            isInvulnerable = true;
+            damageTimer = 0f;
+        }
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
     }
 
-    private void SetRectangle()
+    private void Die()
     {
-        // Obtener el componente SpriteRenderer del GameObject
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Rectan");
-        // El rectángulo puede ser un Sprite 2D con BoxCollider2D
-        boxCollider.enabled = true;
-        circleCollider.enabled = false;
-        transform.localScale = new Vector3(2, 1, 1);  // Escala del rectángulo
+        Debug.Log("¡Jugador muerto!");
+        // Aquí podrías hacer animación, reinicio de nivel, etc.
+        Destroy(gameObject); // Por ahora, destruye al jugador
     }
 
-    private void SetCircle()
+    private void HandleHealthRegeneration()
     {
-        // Obtener el componente SpriteRenderer del GameObject
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Circle");
-        boxCollider.enabled = false;
-        // El círculo usa un CircleCollider2D
-        boxCollider.enabled = false;
-        circleCollider.enabled = true;
-        transform.localScale = new Vector3(1, 1, 1);  // Escala del círculo
+        if (currentShape == PlayerShape.Rectangle && currentHealth < maxHealth)
+        {
+            damageTimer += Time.deltaTime;
+
+            if (damageTimer >= damageCooldown)
+            {
+                Debug.Log("Vida regenerada.");
+                currentHealth = maxHealth;
+                isInvulnerable = false;
+                damageTimer = 0f;
+            }
+        }
     }
 
-    private void SetTriangle()
+    private void OnDrawGizmosSelected()
     {
-        // Obtener el componente SpriteRenderer del GameObject
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = Resources.Load<Sprite>("Sprites/Player/Trian");
-        // El triángulo se puede usar con un Collider 2D personalizado
-        boxCollider.enabled = true;
-        circleCollider.enabled = false;
-        transform.localScale = new Vector3(1, 1, 1);  // Escala del triángulo
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, 0.1f);
+        }
     }
 }
 
