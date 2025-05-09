@@ -1,16 +1,23 @@
 using UnityEngine;
+using System.Collections;
+
 
 public class PlayerController : MonoBehaviour
 {
-
-    public float moveSpeed = 5f;  // Velocidad de movimiento
-    public float jumpForce = 10f; // Fuerza del salto
+    //Variables gravedad, suelo, movimeinto, salto
+    public float moveSpeed = 5f;  
+    public float jumpForce = 10f; 
 
     private Rigidbody2D rb;       // Referencia al Rigidbody2D del jugador
+
+    public Transform[] groundChecks;       // Lista de puntos de GroundCheck
+    public float groundCheckRadius = 0.1f; // Radio del círculo para detección
     private bool isGrounded;      // Para verificar si el jugador está tocando el suelo
 
     public Transform groundCheck; // Puntos para detectar si el jugador está en el suelo
     public LayerMask groundLayer; // Capa del suelo (para que el salto funcione solo si está en el suelo)
+
+
 
     // Variables para las diferentes formas
     private enum PlayerShape { Square, Rectangle, Circle, Triangle }
@@ -25,16 +32,23 @@ public class PlayerController : MonoBehaviour
     private BoxCollider2D boxCollider;
     private CircleCollider2D circleCollider;
 
+    //Variables para daño
     private int maxHealth = 1;
     private int currentHealth = 1;
     private float damageCooldown = 4f; // Tiempo para regenerar vida
     private float damageTimer = 0f;
     private bool isInvulnerable = false;
+    public float blinkDuration = 1f;       // Cuánto dura el parpadeo
+    public float blinkInterval = 0.1f;     // Intervalo entre apagado/encendido
+
+    private SpriteRenderer[] spriteRenderers;
+    
 
 
     // Start is called before the first frame update
     void Start()
     {
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D del jugador
         currentShape = PlayerShape.Square; // Comienza como un cuadrado
         Debug.Log("Jugador iniciado como Cuadrado.");
@@ -60,15 +74,25 @@ public class PlayerController : MonoBehaviour
     // Manejo del salto
     private void HandleJump()
     {
-        // Verificar si el jugador está tocando el suelo
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
+        isGrounded = IsGrounded();
 
-        // Salto
         if (isGrounded && Input.GetButtonDown("Jump"))
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce); // Aplica la fuerza de salto
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
     }
+
+    private bool IsGrounded()
+{
+    foreach (var check in groundChecks)
+    {
+        if (Physics2D.OverlapCircle(check.position, groundCheckRadius, groundLayer))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
     // Cambio de forma al presionar las teclas 1, 2, 3, 4
     private void HandleShapeChange()
@@ -142,16 +166,26 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Enemy"))
+        {
+            TakeDamage();
+        }
+    }
+
     public void TakeDamage()
     {
         if (isInvulnerable) return;
         currentHealth--;
+        Debug.Log("¡Daño recibido! Vida restante: " + currentHealth);
 
-        if (currentShape == PlayerShape.Rectangle)
+        if (currentShape == PlayerShape.Rectangle && currentHealth > 0)
         {
             Debug.Log("¡Rectángulo recibió daño! Vida restante: " + currentHealth);
             isInvulnerable = true;
             damageTimer = 0f;
+            StartCoroutine(Blink());
         }
 
         if (currentHealth <= 0)
@@ -181,6 +215,24 @@ public class PlayerController : MonoBehaviour
                 damageTimer = 0f;
             }
         }
+    }
+
+    private IEnumerator Blink()
+    {
+        float timer = 0f;
+
+        while (timer < blinkDuration)
+        {
+            foreach (var sr in spriteRenderers)
+                sr.enabled = !sr.enabled;
+
+            yield return new WaitForSeconds(blinkInterval);
+            timer += blinkInterval;
+        }
+
+        // Asegúrate de dejarlo visible al final
+        foreach (var sr in spriteRenderers)
+            sr.enabled = true;
     }
 
     private void OnDrawGizmosSelected()

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c32c3f3b3a1c9a94c9b75a086b3c079c
+guid: 6e5f228fab2104f029f98e7a9d200bf8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8723011314812637027
-    second: Trian_0
+      213: -8441499969373129476
+    second: gumba_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -97,19 +97,6 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -126,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Trian_0
+      name: gumba_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 1
-        width: 25
-        height: 23
+        x: 8
+        y: 3
+        width: 12
+        height: 12
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d9031e8fc63a1f680800000000000000
-      internalID: -8723011314812637027
+      spriteID: cf43b0ab084c9da80800000000000000
+      internalID: -8441499969373129476
       vertices: []
       indices: 
       edges: []
@@ -160,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Trian_0: -8723011314812637027
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
