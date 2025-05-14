@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class GumbaController : MonoBehaviour
@@ -13,12 +12,20 @@ public class GumbaController : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+        }
+        else
+        {
+            Debug.LogWarning("Player no encontrado por GumbaController. Asegúrate de que el jugador tiene el tag 'Player'.");
+        }
     }
 
     void Update()
     {
-        if (IsPlayerVisible())
+        if (IsPlayerValid() && IsPlayerVisible())
         {
             FollowPlayer();
         }
@@ -28,12 +35,16 @@ public class GumbaController : MonoBehaviour
         }
     }
 
+    private bool IsPlayerValid()
+    {
+        return player != null;
+    }
+
     private void Patrol()
     {
         Vector2 direction = movingLeft ? Vector2.left : Vector2.right;
         transform.Translate(direction * moveSpeed * Time.deltaTime);
 
-        // Verifica si hay suelo delante
         RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
         if (!hit)
         {
@@ -43,6 +54,8 @@ public class GumbaController : MonoBehaviour
 
     private void FollowPlayer()
     {
+        if (!IsPlayerValid()) return;
+
         float direction = player.position.x - transform.position.x;
         transform.Translate(Mathf.Sign(direction) * moveSpeed * Time.deltaTime * Vector2.right);
     }
@@ -57,7 +70,18 @@ public class GumbaController : MonoBehaviour
 
     private bool IsPlayerVisible()
     {
-        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(transform.position);
+        if (Camera.main == null || !IsPlayerValid()) return false;
+
+        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(player.position);
         return viewportPoint.x > 0 && viewportPoint.x < 1 && viewportPoint.y > 0 && viewportPoint.y < 1;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+{
+    if (collision.CompareTag("DeathZone"))
+    {
+        Debug.Log("Gumba cayó en la zona de muerte.");
+        Destroy(gameObject);
+    }
+}
 }

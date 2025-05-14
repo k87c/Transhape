@@ -3,21 +3,56 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // Método público que puedes llamar desde los botones
+    public static GameManager Instance { get; private set;}
+
+    private string lastSceneBeforeGameOver; //guarda la ultima escena jugada
+
+    // Mï¿½todo pï¿½blico que puedes llamar desde los botones
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
     }
 
-    // También puedes agregar métodos específicos si prefieres
+    // Tambiï¿½n puedes agregar mï¿½todos especï¿½ficos si prefieres
     public void LoadTrainingScene()
     {
-        LoadScene("Training"); // Asegúrate de que el nombre coincida con el de tu escena
+        LoadScene("Training"); // Asegï¿½rate de que el nombre coincida con el de tu escena
+    }
+
+    public void LoadMenuScene()
+    {
+        LoadScene("Menu"); 
+    }
+
+    public void GoToGameOver()
+    {
+        // Guarda la escena activa antes de ir al GameOver
+        lastSceneBeforeGameOver = SceneManager.GetActiveScene().name;
+        Debug.Log("Escena guardada antes de GameOver: " + lastSceneBeforeGameOver);
+        SceneManager.LoadScene("GameOver");
+    }
+
+    public void RestartLastScene()
+    {
+        if (!string.IsNullOrEmpty(lastSceneBeforeGameOver))
+        {
+            SceneManager.LoadScene(lastSceneBeforeGameOver);
+        }
+        else
+        {
+            Debug.LogWarning("No se encontrÃ³ una escena previa para reiniciar.");
+        }
     }
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject); // Destruye duplicados
+            return;
+        }
+
+        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
 }

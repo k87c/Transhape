@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 1650183322280468300}
   m_Layer: 0
   m_Name: Gumba
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -115,7 +115,7 @@ Transform:
   m_GameObject: {fileID: 4527351584051466658}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.3273, y: 2.9361, z: 0.071263}
+  m_LocalPosition: {x: 12.21, y: 7.46, z: 0.071263}
   m_LocalScale: {x: 0.9405542, y: 1.1636596, z: 1.001}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -184,7 +184,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.9972466, y: -1.2149333}
+  m_Offset: {x: -0.9895791, y: -1.223076}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -194,7 +194,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.0554559, y: 0.9222719}
+  m_Size: {x: 1.1800668, y: 1.0222983}
   m_EdgeRadius: 0
 --- !u!114 &1650183322280468300
 MonoBehaviour:
@@ -208,11 +208,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15abc4a3be6bd115b96e5a45f7da36ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  groundCheck: {fileID: 0}
+  moveSpeed: 5.1
+  groundCheck: {fileID: 2028539074395381911}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   groundCheckDistance: 0.2
 --- !u!1 &8941621131882867520
 GameObject:
@@ -239,7 +239,7 @@ Transform:
   m_GameObject: {fileID: 8941621131882867520}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.96, y: -1.8, z: -0.0711918}
+  m_LocalPosition: {x: -0.96, y: -1.71, z: -0.0711918}
   m_LocalScale: {x: 1.063203, y: 0.8593579, z: 0.9990009}
   m_ConstrainProportionsScale: 0
   m_Children: []

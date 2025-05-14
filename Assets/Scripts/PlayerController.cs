@@ -5,7 +5,8 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
     //Variables gravedad, suelo, movimeinto, salto
-    public float moveSpeed = 5f;  
+    public float baseMoveSpeed = 5f;
+    private float currentMoveSpeed; 
     public float jumpForce = 10f; 
 
     private Rigidbody2D rb;       // Referencia al Rigidbody2D del jugador
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        currentMoveSpeed = baseMoveSpeed;
         spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D del jugador
         currentShape = PlayerShape.Square; // Comienza como un cuadrado
@@ -62,13 +64,18 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleShapeChange();
         HandleHealthRegeneration();
+        if (currentShape == PlayerShape.Triangle && !IsGrounded())
+        {
+            transform.Rotate(0f, 0f, 360f * Time.deltaTime);
+        }
     }
 
     // Manejo del movimiento
     private void HandleMovement()
     {
         float moveInput = Input.GetAxis("Horizontal"); // Para las teclas A/D o flechas izquierda/derecha
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y); // Movimiento horizontal
+        rb.linearVelocity = new Vector2(moveInput * currentMoveSpeed, rb.linearVelocity.y); // Movimiento horizontal
+
     }
 
     // Manejo del salto
@@ -134,8 +141,12 @@ public class PlayerController : MonoBehaviour
     // Cambiar la forma y aplicar las transformaciones correspondientes
     private void SetShape(PlayerShape newShape)
     {
+        // Guarda la velocidad actual
+        Vector2 currentVelocity = rb.linearVelocity;
+
         currentShape = newShape;
 
+        // Desactiva todos los objetos visuales
         squareObj.SetActive(false);
         rectObj.SetActive(false);
         circleObj.SetActive(false);
@@ -143,34 +154,52 @@ public class PlayerController : MonoBehaviour
 
         switch (currentShape)
         {
-        case PlayerShape.Square:
-            squareObj.SetActive(true);
-            maxHealth = 1;
-            currentHealth = 1;
-            break;
-        case PlayerShape.Rectangle:
-            rectObj.SetActive(true);
-            maxHealth = 2;
-            currentHealth = 2;
-            break;
-        case PlayerShape.Circle:
-            circleObj.SetActive(true);
-            maxHealth = 1;
-            currentHealth = 1;
-            break;
-        case PlayerShape.Triangle:
-            triangleObj.SetActive(true);
-            maxHealth = 1;
-            currentHealth = 1;
+            case PlayerShape.Square:
+                squareObj.SetActive(true);
+                maxHealth = 1;
+                currentHealth = 1;
+                break;
+            case PlayerShape.Rectangle:
+                rectObj.SetActive(true);
+                maxHealth = 2;
+                currentHealth = 2;
+                break;
+            case PlayerShape.Circle:
+                circleObj.SetActive(true);
+                maxHealth = 1;
+                currentHealth = 1;
+                break;
+            case PlayerShape.Triangle:
+                triangleObj.SetActive(true);
+                maxHealth = 1;
+                currentHealth = 1;
             break;
         }
+
+        // Restaura la velocidad
+        rb.linearVelocity = currentVelocity;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Enemy"))
+        Debug.Log("Jugador cayó en la DeathZone.");
+        Die();
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (currentShape == PlayerShape.Triangle && !IsGrounded())
+            {
+                // Eliminar enemigo si está girando en el aire
+                Destroy(collision.gameObject);
+                Debug.Log("¡Enemigo destruido por ataque giratorio del triángulo!");
+            }
+        else
         {
             TakeDamage();
+        }
         }
     }
 
@@ -197,6 +226,7 @@ public class PlayerController : MonoBehaviour
     private void Die()
     {
         Debug.Log("¡Jugador muerto!");
+        GameManager.Instance.GoToGameOver();
         // Aquí podrías hacer animación, reinicio de nivel, etc.
         Destroy(gameObject); // Por ahora, destruye al jugador
     }
