@@ -59,9 +59,18 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleShapeChange();
         HandleHealthRegeneration();
-        if (currentShape == PlayerShape.Triangle && !isGrounded)
+        if (currentShape == PlayerShape.Triangle && !isGrounded && !isTouchingWall)
         {
             transform.Rotate(0f, 0f, 360f * Time.deltaTime);
+        }
+        // Aumentar velocidad progresiva en forma de círculo
+        if (currentShape == PlayerShape.Circle)
+        {
+            currentMoveSpeed = Mathf.MoveTowards(currentMoveSpeed, baseMoveSpeed * 2f, Time.deltaTime * 2f);
+        }
+        else
+        {
+            currentMoveSpeed = baseMoveSpeed;
         }
     }
 
@@ -217,7 +226,7 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = false;
         }
-        
+
         if (collision.gameObject.CompareTag("Wall"))
         {
             isTouchingWall = false;

@@ -77,11 +77,11 @@ public class GumbaController : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
-{
-    if (collision.CompareTag("DeathZone"))
     {
-        Debug.Log("Gumba cayó en la zona de muerte.");
-        Destroy(gameObject);
+        if (collision.CompareTag("DeathZone"))
+        {
+            Debug.Log("Gumba cayó en la zona de muerte.");
+            Destroy(gameObject);
+        }
     }
-}
 }
