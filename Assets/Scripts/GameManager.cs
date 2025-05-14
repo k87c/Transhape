@@ -14,14 +14,28 @@ public class GameManager : MonoBehaviour
     }
 
     // Tambi�n puedes agregar m�todos espec�ficos si prefieres
-    public void LoadTrainingScene()
+    public void LoadLevel01Scene()
     {
-        LoadScene("Training"); // Aseg�rate de que el nombre coincida con el de tu escena
+        Debug.Log("Carga Level01.");
+        LoadScene("Level01"); // Aseg�rate de que el nombre coincida con el de tu escena
+    }
+
+    public void LoadInstScene()
+    {
+        Debug.Log("Carga Inst.");
+        LoadScene("Inst"); 
     }
 
     public void LoadMenuScene()
     {
+        Debug.Log("Carga Menu.");
         LoadScene("Menu"); 
+    }
+
+    public void QuitGame()
+    {   
+        Debug.Log("Cerrando el juego...");
+        Application.Quit();
     }
 
     public void GoToGameOver()

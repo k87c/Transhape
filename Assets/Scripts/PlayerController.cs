@@ -11,14 +11,9 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;       // Referencia al Rigidbody2D del jugador
 
-    public Transform[] groundChecks;       // Lista de puntos de GroundCheck
-    public float groundCheckRadius = 0.1f; // Radio del círculo para detección
-    private bool isGrounded;      // Para verificar si el jugador está tocando el suelo
-
-    public Transform groundCheck; // Puntos para detectar si el jugador está en el suelo
-    public LayerMask groundLayer; // Capa del suelo (para que el salto funcione solo si está en el suelo)
-
-
+    private bool isGrounded = false;
+     private bool isTouchingWall = false;
+    private int wallJumpDirection = 0; // -1 izquierda, 1 derecha
 
     // Variables para las diferentes formas
     private enum PlayerShape { Square, Rectangle, Circle, Triangle }
@@ -64,7 +59,7 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleShapeChange();
         HandleHealthRegeneration();
-        if (currentShape == PlayerShape.Triangle && !IsGrounded())
+        if (currentShape == PlayerShape.Triangle && !isGrounded)
         {
             transform.Rotate(0f, 0f, 360f * Time.deltaTime);
         }
@@ -81,25 +76,21 @@ public class PlayerController : MonoBehaviour
     // Manejo del salto
     private void HandleJump()
     {
-        isGrounded = IsGrounded();
-
-        if (isGrounded && Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump"))
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            if (isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+            else if (currentShape == PlayerShape.Square && isTouchingWall)
+            {
+                float wallPushForce = 8f;
+                rb.linearVelocity = new Vector2(wallJumpDirection * wallPushForce, jumpForce);
+            }
         }
     }
 
-    private bool IsGrounded()
-{
-    foreach (var check in groundChecks)
-    {
-        if (Physics2D.OverlapCircle(check.position, groundCheckRadius, groundLayer))
-        {
-            return true;
-        }
-    }
-    return false;
-}
+    
 
     // Cambio de forma al presionar las teclas 1, 2, 3, 4
     private void HandleShapeChange()
@@ -143,7 +134,6 @@ public class PlayerController : MonoBehaviour
     {
         // Guarda la velocidad actual
         Vector2 currentVelocity = rb.linearVelocity;
-
         currentShape = newShape;
 
         // Desactiva todos los objetos visuales
@@ -188,18 +178,50 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            isTouchingWall = true;
+
+            if (collision.contacts.Length > 0)
+            {
+                Vector2 normal = collision.contacts[0].normal;
+
+                if (normal.x > 0.5f) wallJumpDirection = 1; // pared a la izquierda
+                else if (normal.x < -0.5f) wallJumpDirection = -1; // pared a la derecha
+            }
+        }
+
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            if (currentShape == PlayerShape.Triangle && !IsGrounded())
+            if (currentShape == PlayerShape.Triangle && !isGrounded)
             {
-                // Eliminar enemigo si está girando en el aire
                 Destroy(collision.gameObject);
                 Debug.Log("¡Enemigo destruido por ataque giratorio del triángulo!");
             }
-        else
-        {
-            TakeDamage();
+            else
+            {
+                TakeDamage();
+            }
         }
+    }
+
+    //Añade OnCollisionExit2D para detectar cuándo ya no está en el suelo:
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+        
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            isTouchingWall = false;
+            wallJumpDirection = 0;
         }
     }
 
@@ -263,15 +285,6 @@ public class PlayerController : MonoBehaviour
         // Asegúrate de dejarlo visible al final
         foreach (var sr in spriteRenderers)
             sr.enabled = true;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (groundCheck != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(groundCheck.position, 0.1f);
-        }
     }
 }
 
