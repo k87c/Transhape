@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour
 
     private SpriteRenderer[] spriteRenderers;
     
+    // 🦊 Coyote Time
+    public float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
 
 
     // Start is called before the first frame update
@@ -56,6 +59,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         HandleMovement();
+        if (isGrounded)
+        {
+            coyoteTimeCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
         HandleJump();
         HandleShapeChange();
         HandleHealthRegeneration();
@@ -87,9 +98,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump"))
         {
-            if (isGrounded)
+            if (coyoteTimeCounter > 0f)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+                coyoteTimeCounter = 0f; // evitar múltiples saltos
             }
             else if (currentShape == PlayerShape.Square && isTouchingWall)
             {
