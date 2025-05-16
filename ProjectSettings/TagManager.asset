@@ -9,6 +9,7 @@ TagManager:
   - DeathZone
   - Ground
   - Goal
+  - FInalGoal
   layers:
   - Default
   - TransparentFX

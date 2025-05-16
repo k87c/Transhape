@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     //Variables gravedad, suelo, movimeinto, salto
     public float baseMoveSpeed = 5f;
     private float currentMoveSpeed; 
-    public float jumpForce = 10f; 
+    public float jumpForce = 2f; 
 
     private Rigidbody2D rb;       // Referencia al Rigidbody2D del jugador
 
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer[] spriteRenderers;
     
     // 🦊 Coyote Time
-    public float coyoteTime = 0.2f;
+    public float coyoteTime = 0.1f;
     private float coyoteTimeCounter;
 
 
@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
             }
             else if (currentShape == PlayerShape.Square && isTouchingWall)
             {
-                float wallPushForce = 8f;
+                float wallPushForce = 2f;
                 rb.linearVelocity = new Vector2(wallJumpDirection * wallPushForce, jumpForce);
                 PlaySound(jumpSound);
             }

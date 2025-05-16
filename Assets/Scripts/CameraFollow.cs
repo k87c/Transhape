@@ -2,43 +2,43 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform player;       // Referencia al jugador
-    public float smoothSpeed = 0.125f;  // Velocidad de suavizado del movimiento de la c�mara
-    public Vector3 offset = new Vector3(0, 3, -15);        // Desplazamiento entre la c�mara y el jugador
+    public Transform player;
+    public float smoothSpeed = 0.125f;
+    public Vector3 offset = new Vector3(0, 5, -15);
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // Puedes establecer un desplazamiento predeterminado si lo deseas
-        offset = new Vector3(0, 3, -15); // Por ejemplo, 3 unidades arriba y 10 unidades atr�s
-    }
+    public float verticalOffsetAmount = 2f; // Cuánto se mueve la cámara verticalmente al mirar arriba/abajo
+    private float verticalOffsetInput = 0f; // Valor que cambia según la entrada del jugador
 
-    // Update is called once per frame
     void LateUpdate()
-    {   
-         if (player != null)
+    {
+        if (player != null)
         {
-            // Calcula la posición deseada de la cámara
-            Vector3 desiredPosition = player.position + offset;
+            // Detectar entrada de teclas arriba/abajo
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, verticalOffsetAmount, Time.deltaTime * 5f);
+            }
+            else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, -verticalOffsetAmount, Time.deltaTime * 5f);
+            }
+            else
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, 0f, Time.deltaTime * 5f);
+            }
 
-            // Suaviza el movimiento de la cámara hacia la posición deseada
+            // Aplicar desplazamiento adicional vertical
+            Vector3 modifiedOffset = offset + new Vector3(0, verticalOffsetInput, 0);
+            Vector3 desiredPosition = player.position + modifiedOffset;
+
             Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-
-            // Actualiza la posición de la cámara
             transform.position = smoothedPosition;
         }
-    }    
+    }
 }
 
 
 /*
-
-Selecciona tu Cámara en Unity.
-
-En el componente Camera, verás una opción llamada "Size" (cuando el tipo es Orthographic).
-
-Aumenta ese valor (por ejemplo, de 5 a 7 u 8) para alejar la vista.
-
 
 using UnityEngine;
 
@@ -69,7 +69,8 @@ public class CameraFollow : MonoBehaviour
             // Actualiza la posición de la cámara
             transform.position = smoothedPosition;
         }
-    
+    }    
+}
 
 
 
@@ -120,5 +121,47 @@ provoca mareo
         transform.position = smoothedPosition;
     }
 
+
+
+---------------------
+
+using UnityEngine;
+
+public class CameraFollow : MonoBehaviour
+{
+    public Transform player;
+    public float smoothSpeed = 0.125f;
+    public Vector3 offset = new Vector3(0, 3, -15);
+
+    public float verticalOffsetAmount = 2f; // Cuánto se mueve la cámara verticalmente al mirar arriba/abajo
+    private float verticalOffsetInput = 0f; // Valor que cambia según la entrada del jugador
+
+    void LateUpdate()
+    {
+        if (player != null)
+        {
+            // Detectar entrada de teclas arriba/abajo
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, verticalOffsetAmount, Time.deltaTime * 5f);
+            }
+            else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, -verticalOffsetAmount, Time.deltaTime * 5f);
+            }
+            else
+            {
+                verticalOffsetInput = Mathf.Lerp(verticalOffsetInput, 0f, Time.deltaTime * 5f);
+            }
+
+            // Aplicar desplazamiento adicional vertical
+            Vector3 modifiedOffset = offset + new Vector3(0, verticalOffsetInput, 0);
+            Vector3 desiredPosition = player.position + modifiedOffset;
+
+            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+            transform.position = smoothedPosition;
+        }
+    }
+}
 
 */
