@@ -15,6 +15,11 @@ public class PlayerController : MonoBehaviour
      private bool isTouchingWall = false;
     private int wallJumpDirection = 0; // -1 izquierda, 1 derecha
 
+    //Variables sonido
+    public AudioClip jumpSound;
+    public AudioClip damageSound;
+    private AudioSource audioSource;
+
     // Variables para las diferentes formas
     private enum PlayerShape { Square, Rectangle, Circle, Triangle }
     private PlayerShape currentShape;
@@ -47,6 +52,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         currentMoveSpeed = baseMoveSpeed;
         spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>(); // Obtener el Rigidbody2D del jugador
@@ -102,11 +108,13 @@ public class PlayerController : MonoBehaviour
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 coyoteTimeCounter = 0f; // evitar múltiples saltos
+                PlaySound(jumpSound);
             }
             else if (currentShape == PlayerShape.Square && isTouchingWall)
             {
                 float wallPushForce = 8f;
                 rb.linearVelocity = new Vector2(wallJumpDirection * wallPushForce, jumpForce);
+                PlaySound(jumpSound);
             }
         }
     }
@@ -193,8 +201,22 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Jugador cayó en la DeathZone.");
-        Die();
+        if (collision.CompareTag("DeathZone"))
+        {
+            Debug.Log("Jugador cayó en la DeathZone.");
+            Die();
+        }
+
+        if (collision.CompareTag("Goal"))
+        {
+            Debug.Log("Jugador llegó al objetivo.");
+            ReachGoal();
+        }
+    }
+
+    private void ReachGoal()
+    {
+        GameManager.Instance.GoToVictory(); 
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -250,7 +272,13 @@ public class PlayerController : MonoBehaviour
     {
         if (isInvulnerable) return;
         currentHealth--;
-        Debug.Log("¡Daño recibido! Vida restante: " + currentHealth);
+
+        // Reproducir sonido solo si no muere directamente
+        if (currentHealth > 0 && damageSound != null && audioSource != null)
+        {
+            Debug.Log("¡Daño recibido! Vida restante: " + currentHealth);
+            audioSource.PlayOneShot(damageSound);
+        }
 
         if (currentShape == PlayerShape.Rectangle && currentHealth > 0)
         {
@@ -269,9 +297,8 @@ public class PlayerController : MonoBehaviour
     private void Die()
     {
         Debug.Log("¡Jugador muerto!");
+        Destroy(gameObject); 
         GameManager.Instance.GoToGameOver();
-        // Aquí podrías hacer animación, reinicio de nivel, etc.
-        Destroy(gameObject); // Por ahora, destruye al jugador
     }
 
     private void HandleHealthRegeneration()
@@ -290,6 +317,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+     private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
+
+    //Corrutinas
+
     private IEnumerator Blink()
     {
         float timer = 0f;
@@ -307,6 +344,7 @@ public class PlayerController : MonoBehaviour
         foreach (var sr in spriteRenderers)
             sr.enabled = true;
     }
+
 }
 
 

@@ -46,6 +46,10 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("GameOver");
     }
 
+    public void GoToVictory() {
+        SceneManager.LoadScene("Victory");
+    }
+
     public void RestartLastScene()
     {
         if (!string.IsNullOrEmpty(lastSceneBeforeGameOver))
@@ -57,6 +61,8 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("No se encontró una escena previa para reiniciar.");
         }
     }
+
+    
 
     void Awake()
     {
