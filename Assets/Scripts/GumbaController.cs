@@ -92,7 +92,7 @@ public class GumbaController : MonoBehaviour
 
     // Empuja levemente a Gumba en la dirección contraria para evitar quedarse dentro del collider
     float pushDistance = 0.1f;
-    Vector3 pushDirection = movingLeft ? Vector3.left : Vector3.right;
+    Vector3 pushDirection = !movingLeft ? Vector3.left : Vector3.right;
     transform.position += pushDirection * pushDistance;
 }
 

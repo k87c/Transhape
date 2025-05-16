@@ -12,6 +12,11 @@ public class MenuUI : MonoBehaviour
         GameManager.Instance.LoadInstScene();
     }
 
+    public void OnCreditsPressed()
+    {
+        GameManager.Instance.LoadCreditsScene();
+    }
+
     public void OnQuitPressed()
     {
         GameManager.Instance.QuitGame();

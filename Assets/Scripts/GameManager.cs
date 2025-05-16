@@ -7,17 +7,15 @@ public class GameManager : MonoBehaviour
 
     private string lastSceneBeforeGameOver; //guarda la ultima escena jugada
 
-    // M�todo p�blico que puedes llamar desde los botones
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
     }
 
-    // Tambi�n puedes agregar m�todos espec�ficos si prefieres
     public void LoadLevel01Scene()
     {
         Debug.Log("Carga Level01.");
-        LoadScene("Level01"); // Aseg�rate de que el nombre coincida con el de tu escena
+        LoadScene("Level01");
     }
     
     public void LoadLevel02Scene()
@@ -31,11 +29,17 @@ public class GameManager : MonoBehaviour
         Debug.Log("Carga Inst.");
         LoadScene("Inst");
     }
+    
+    public void LoadCreditsScene()
+    {
+        Debug.Log("Carga Credits.");
+        LoadScene("Credits");
+    }
 
     public void LoadMenuScene()
     {
         Debug.Log("Carga Menu.");
-        LoadScene("Menu"); 
+        LoadScene("Menu");
     }
 
     public void QuitGame()
