@@ -19,11 +19,17 @@ public class GameManager : MonoBehaviour
         Debug.Log("Carga Level01.");
         LoadScene("Level01"); // Aseg�rate de que el nombre coincida con el de tu escena
     }
+    
+    public void LoadLevel02Scene()
+    {
+        Debug.Log("Carga Level02.");
+        LoadScene("Level02"); 
+    }
 
     public void LoadInstScene()
     {
         Debug.Log("Carga Inst.");
-        LoadScene("Inst"); 
+        LoadScene("Inst");
     }
 
     public void LoadMenuScene()
@@ -48,6 +54,10 @@ public class GameManager : MonoBehaviour
 
     public void GoToVictory() {
         SceneManager.LoadScene("Victory");
+    }
+
+    public void GoToFinal() {
+        SceneManager.LoadScene("Final");
     }
 
     public void RestartLastScene()

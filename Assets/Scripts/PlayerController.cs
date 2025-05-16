@@ -212,11 +212,22 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Jugador llegó al objetivo.");
             ReachGoal();
         }
+
+        if (collision.CompareTag("FinalGoal"))
+        {
+            Debug.Log("Jugador llegó al ultimo objetivo.");
+            ReachFinalGoal();
+        }
     }
 
     private void ReachGoal()
     {
         GameManager.Instance.GoToVictory(); 
+    }
+
+    private void ReachFinalGoal()
+    {
+        GameManager.Instance.GoToFinal();
     }
 
     void OnCollisionEnter2D(Collision2D collision)

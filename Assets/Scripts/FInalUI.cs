@@ -10,7 +10,7 @@ public class FInalUI : MonoBehaviour
 
     IEnumerator WaitAndReturnToMenu()
     {
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(3f);
         GameManager.Instance.LoadMenuScene();
     }
     

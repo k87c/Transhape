@@ -3,6 +3,137 @@ using UnityEngine;
 public class GumbaController : MonoBehaviour
 {
     public float moveSpeed = 2f;
+    public LayerMask groundLayer;
+    public float groundCheckDistance = 0.1f;
+    public float flipCooldown = 0.2f; // Tiempo mínimo entre giros
+
+    private bool movingLeft = true;
+    private Transform player;
+    private BoxCollider2D boxCollider;
+    private float lastFlipTime = -Mathf.Infinity;
+
+    private float movePauseTime = 0.5f; // tiempo que se queda quieto tras girar
+    private float nextMoveTime = 0f;
+
+
+    void Start()
+    {
+        boxCollider = GetComponent<BoxCollider2D>();
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+        }
+    }
+
+    void Update()
+    {
+        if (Time.time < nextMoveTime) return;
+
+        if (IsVisibleToCamera())
+        {
+            FollowPlayer();
+        }
+        else
+        {
+            Patrol();
+        }
+    }
+
+
+    private void Patrol()
+    {
+        Vector2 direction = movingLeft ? Vector2.left : Vector2.right;
+        transform.Translate(direction * moveSpeed * Time.deltaTime);
+
+        // Parámetros de raycast
+        Bounds bounds = boxCollider.bounds;
+        float forwardOffset = 2f;  // Distancia hacia delante
+        Vector2 rayOrigin = movingLeft 
+            ? new Vector2(bounds.min.x - forwardOffset, bounds.min.y)
+            : new Vector2(bounds.max.x + forwardOffset, bounds.min.y);
+
+        Vector2 rayDirection = new Vector2(direction.x, -0.5f).normalized;
+
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, rayDirection, groundCheckDistance, groundLayer);
+        Debug.DrawRay(rayOrigin, rayDirection * groundCheckDistance, Color.red);
+
+        if (!hit && Time.time > lastFlipTime + flipCooldown)
+        {
+            Flip();
+        }
+
+        Vector3 scale = transform.localScale;
+        scale.x = movingLeft ? -1 : 1;
+        transform.localScale = scale;
+    }
+
+
+
+    private void FollowPlayer()
+    {
+        if (player == null) return;
+
+        float direction = player.position.x - transform.position.x;
+        transform.Translate(Mathf.Sign(direction) * moveSpeed * Time.deltaTime * Vector2.right);
+
+        // Voltear sprite visualmente
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Sign(direction) * Mathf.Abs(scale.x);
+        transform.localScale = scale;
+    }
+
+    private void Flip()
+{
+    movingLeft = !movingLeft;
+    lastFlipTime = Time.time;
+    nextMoveTime = Time.time + movePauseTime;
+
+    // Empuja levemente a Gumba en la dirección contraria para evitar quedarse dentro del collider
+    float pushDistance = 0.1f;
+    Vector3 pushDirection = movingLeft ? Vector3.left : Vector3.right;
+    transform.position += pushDirection * pushDistance;
+}
+
+
+    private bool IsVisibleToCamera()
+    {
+        if (Camera.main == null) return false;
+
+        Vector3 viewPos = Camera.main.WorldToViewportPoint(transform.position);
+        return viewPos.x > 0 && viewPos.x < 1 && viewPos.y > 0 && viewPos.y < 1;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall") && Time.time > lastFlipTime + flipCooldown)
+        {
+            Flip();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("DeathZone"))
+        {
+            Destroy(gameObject);
+        }
+    }
+}
+
+
+
+
+/*
+
+actual
+
+using UnityEngine;
+
+public class GumbaController : MonoBehaviour
+{
+    public float moveSpeed = 2f;
     public Transform groundCheck;
     public LayerMask groundLayer;
     public float groundCheckDistance = 0.2f;
@@ -88,17 +219,15 @@ public class GumbaController : MonoBehaviour
 }
 
 
+-------------------------------------------------------------------------------------------------------------------
+persigue, funciona con fallos
 
 
+    using UnityEngine;
 
-/*
-
-public float moveSpeed = 2f;
-    public Transform groundCheck;
-    public LayerMask groundLayer;
-    public float groundCheckDistance = 0.2f;
-
-    private bool movingLeft = true;
+public class GumbaController : MonoBehaviour
+{
+    public float moveSpeed = 2f;
     private Transform player;
 
     void Start()
@@ -110,60 +239,36 @@ public float moveSpeed = 2f;
         }
         else
         {
-            Debug.LogWarning("Player no encontrado por GumbaController. Asegúrate de que el jugador tiene el tag 'Player'.");
+            Debug.LogWarning("Player no encontrado.");
         }
     }
 
     void Update()
     {
-        if (IsPlayerValid() && IsPlayerVisible())
+        if (IsPlayerVisible())
         {
             FollowPlayer();
-        }
-        else
-        {
-            Patrol();
-        }
-    }
-
-    private bool IsPlayerValid()
-    {
-        return player != null;
-    }
-
-    private void Patrol()
-    {
-        Vector2 direction = movingLeft ? Vector2.left : Vector2.right;
-        transform.Translate(direction * moveSpeed * Time.deltaTime);
-
-        RaycastHit2D hit = Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundLayer);
-        if (!hit)
-        {
-            Flip();
         }
     }
 
     private void FollowPlayer()
     {
-        if (!IsPlayerValid()) return;
+        if (player == null) return;
 
         float direction = player.position.x - transform.position.x;
         transform.Translate(Mathf.Sign(direction) * moveSpeed * Time.deltaTime * Vector2.right);
-    }
 
-    private void Flip()
-    {
-        movingLeft = !movingLeft;
-        Vector3 localScale = transform.localScale;
-        localScale.x *= -1;
-        transform.localScale = localScale;
+        // Opcional: voltear sprite según dirección
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Sign(direction) * Mathf.Abs(scale.x);
+        transform.localScale = scale;
     }
 
     private bool IsPlayerVisible()
     {
-        if (Camera.main == null || !IsPlayerValid()) return false;
+        if (Camera.main == null || player == null) return false;
 
-        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(player.position);
+        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(transform.position);
         return viewportPoint.x > 0 && viewportPoint.x < 1 && viewportPoint.y > 0 && viewportPoint.y < 1;
     }
 
@@ -175,92 +280,9 @@ public float moveSpeed = 2f;
             Destroy(gameObject);
         }
     }
+}
 
--------------------------------------------------------------------------------------------------------------------
 
-    public float moveSpeed = 2f;
-    public float groundCheckDistance = 0.2f;
-    public float wallCheckDistance = 0.1f;
-    public LayerMask groundLayer;
-    public LayerMask obstacleLayer;
 
-    private Rigidbody2D rb;
-    private Transform player;
-    private Vector2 moveDirection = Vector2.left;
-    private bool isFacingLeft = true;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            player = playerObj.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player no encontrado por GumbaController.");
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (player != null && IsVisible())
-        {
-            // Perseguir al jugador
-            float direction = player.position.x - transform.position.x;
-            moveDirection = direction < 0 ? Vector2.left : Vector2.right;
-        }
-
-        Patrol();
-    }
-
-    private void Patrol()
-    {
-        Vector2 position = rb.position;
-        Vector2 direction = moveDirection;
-
-        // Verificar si hay suelo delante
-        Vector2 groundCheckPos = position + Vector2.down * groundCheckDistance + (Vector2)direction * 0.1f;
-        RaycastHit2D groundHit = Physics2D.Raycast(groundCheckPos, Vector2.down, 0.1f, groundLayer);
-
-        // Verificar colisión con pared u obstáculo
-        Vector2 wallCheckPos = position + (Vector2)direction * wallCheckDistance;
-        RaycastHit2D wallHit = Physics2D.Raycast(wallCheckPos, direction, 0.1f, obstacleLayer);
-
-        if (!groundHit.collider || wallHit.collider)
-        {
-            Flip();
-        }
-
-        // Mover al Gumba
-        rb.linearVelocity = new Vector2(moveDirection.x * moveSpeed, rb.linearVelocity.y);
-    }
-
-    private void Flip()
-    {
-        moveDirection = -moveDirection;
-        isFacingLeft = !isFacingLeft;
-
-        // Voltear visualmente el sprite
-        Vector3 scale = transform.localScale;
-        scale.x = Mathf.Abs(scale.x) * (isFacingLeft ? 1 : -1);
-        transform.localScale = scale;
-    }
-
-    private bool IsVisible()
-    {
-        if (Camera.main == null) return false;
-
-        Vector3 viewportPoint = Camera.main.WorldToViewportPoint(transform.position);
-        return viewportPoint.x > 0 && viewportPoint.x < 1 && viewportPoint.y > 0 && viewportPoint.y < 1;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.CompareTag("Wall") || collision.collider.CompareTag("Enemy"))
-        {
-            Flip();
-        }
-    }
+ --------------------------------   
 */
