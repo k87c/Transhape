@@ -291,7 +291,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -16.4, y: -141.1}
+  m_AnchoredPosition: {x: -16.4, y: -150.4}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &87336739
@@ -911,7 +911,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 125.5}
+  m_AnchoredPosition: {x: 0, y: 140.7}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1158116380
@@ -934,35 +934,14 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'El objectivo es llegar a la meta.
-
-
-    Puedes moverte con A y D o las
-    flechas direccionales izquierda, derecha.
-
-    Puedes subir o bajar la camara
-    ligeramente con W y S, o flechas direccionales arriba, abajo.
-
-    Usa barra
-    espaciadora para saltar.
-
-    Esc para pausar el juego.
-
-
-    Las teclas 1 al
-    4 te transforman en diferentes formas:
-
-
-    1.Cuadrado: Puedes saltar desde
-    las paredes.
-
-    2.Rectangulo: No mueres en un solo golpe, recuperas vida despues
-    de 4 segundos
-
-    3.Circulo: Te mueves mas rapido.
-
-    4.Triangulo: Mientras
-    estes en el aire, puedes matar enemigos.'
+  m_text: "El objectivo es llegar a la meta.\n\nPuedes moverte con A y D o las flechas
+    direccionales izquierda, derecha.\nPuedes subir o bajar la camara ligeramente
+    con W y S, o flechas direccionales arriba, abajo.\nUsa barra espaciadora para
+    saltar.\nEsc para pausar el juego.\n\nLas teclas 1 al 4 te transforman en diferentes
+    formas:\n\n\n1.Cuadrado: Puedes saltar desde las paredes, escalar paredes saltando.\n\n2.Rectangulo:
+    No mueres en un solo golpe, parpadeas si solo te queda un punto,\n  recuperas
+    vida despues de 4 segundos. \n  \n3.Circulo: Te mueves mas rapido, saltos horizontales
+    mas largos.\n\n4.Triangulo: Mientras estes en el aire, puedes matar enemigos."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -989,8 +968,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 13
+  m_fontSizeBase: 13
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
