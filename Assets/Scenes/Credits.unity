@@ -400,9 +400,9 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 626bc169dd1354130a697094492ee6fd, type: 3}
   m_Resource: {fileID: 8300000, guid: 626bc169dd1354130a697094492ee6fd, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_Volume: 0.2
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -813,7 +813,7 @@ MonoBehaviour:
     https://assetstore.unity.com/packages/audio/sound-fx/free-casual-pack-sfx-197054
 
 
-    Programing:
+    Programming:
     DVD
 
 
